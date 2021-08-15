@@ -1,0 +1,12 @@
+name: mort-app
+title:
+username:
+account: brian-clark-rpi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3682342
+bundleId: 4259483
+url: https://brian-clark-rpi.shinyapps.io/mort-app/
+when: 1614056345.04323
+asMultiple: FALSE
+asStatic: FALSE
