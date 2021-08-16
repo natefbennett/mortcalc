@@ -53,6 +53,13 @@ ui <- fluidPage(
                               selected = 20
       ),
       hr(),
+      sliderInput("yearsowned", "Years Owned Before Selling",
+                  min = 1,
+                  max = 29,
+                  value = 15,
+                  step = 1
+      ),
+      hr(),
       checkboxInput("plot", "Display plot?", TRUE),
       hr(),
       # checkboxInput("tax", "Include Tax Effects", TRUE),
