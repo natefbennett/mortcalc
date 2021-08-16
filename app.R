@@ -225,17 +225,17 @@ server <- function(input, output) {
       n <- 12*yearsLeft
       totalPayments <- 12*as.integer(input$length)
       interestPercent <- input$interest/100
-      monthyInterest <- interestPercent / 12
-      newMonthlyPayment <- sellearly(interestRate = monthyInterest, numPayment = totalPayments, loanValue = prin)
-      amountLeft <- n * newMonthlyPayment
+      monthlyInterest <- interestPercent / 12
+      newMonthlyPayment <- sellearly(interestRate = monthlyInterest, numPayment = totalPayments, loanValue = prin)
+      amountLeft <- newMonthlyPayment/monthlyInterest*(1-1/(1+monthlyInterest)^(totalPayments-n))
       
       futureValue <- amountLeft*(1+interestPercent)^yearsLeft
       HTML(paste0(
         "<br>",
         "<br>",
         "<br>",
-        "New Monthy Payment: ", format(round(newMonthlyPayment, digits = 2), big.mark = ","),
-        "<br>",
+        # "New Monthy Payment: ", format(round(newMonthlyPayment, digits = 2), big.mark = ","),
+        # "<br>",
         "Amount left to Pay: ", format(round(amountLeft, digits = 2), big.mark = ","),
         "<br>",
         "Future Value: ", format(round(futureValue, digits = 2), big.mark = ",")
