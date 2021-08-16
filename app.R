@@ -116,7 +116,13 @@ server <- function(input, output) {
     J <- I / (12 * 100)
     N <- 12 * L
     M <- P * J / (1 - (1 + J)^(-N))
+    M15 <- P * J / (1 - (1 + J)^(-(12*15)))
+    M20 <- P * J / (1 - (1 + J)^(-(12*20)))
+    M30 <- P * J / (1 - (1 + J)^(-(12*30)))
     monthPay <<- M
+    monthPay15 <<- M15
+    monthPay20 <<- M20
+    monthPay30 <<- M30
     # Calculate Amortization for each Month
     if (amort == TRUE) {
       Pt <- P # current principal or amount of the loan
@@ -218,7 +224,13 @@ server <- function(input, output) {
       "<br>",
       "<b>", "Monthly payment: ", format(round(monthPay, digits = 2), big.mark = ","), "</b>",
       "<br>",
-      "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>"
+      "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>",
+      "<br>",
+      "15 year mortgage: ", format(round(monthPay15, digits = 2), big.mark = ","), "</b>",
+      "<br>",
+      "20 year mortgage: ", format(round(monthPay20, digits = 2), big.mark = ","), "</b>",
+      "<br>",
+      "30 year mortgage: ", format(round(monthPay30, digits = 2), big.mark = ","), "</b>"
     ),
     if (input$selling == TRUE) {
       yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
