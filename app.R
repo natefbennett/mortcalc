@@ -53,12 +53,14 @@ ui <- fluidPage(
                               selected = 20
       ),
       hr(),
+      p(HTML('<p>How much will I owe if I sell my house in X years?</p>')),
       sliderInput("yearsowned", "Years Owned Before Selling",
                   min = 1,
                   max = 29,
                   value = 15,
                   step = 1
       ),
+      checkboxInput("selling", "Selling the house before the mortgage is paid?", FALSE),
       hr(),
       checkboxInput("plot", "Display plot?", TRUE),
       hr(),
@@ -145,6 +147,7 @@ server <- function(input, output) {
       )
       aDFyear <<- aDFyear
     }
+
     if (plotData == TRUE) {
       aDFyear2 <- aDFyear %>%
         rename(
@@ -193,7 +196,10 @@ server <- function(input, output) {
     
     
   }
-  
+  sellearly <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
+    paymentValue <- loanValue*(interestRate*(1+interestRate)^numPayment)/(((1+interestRate)^numPayment)-1)
+    return( paymentValue )
+  }
   # ------------------------
  
   # --------------------------
@@ -201,7 +207,8 @@ server <- function(input, output) {
     output$text <- renderUI({
       prin <- input$principal
     mortgage(P = prin, I = input$interest, L = as.integer(input$length), plotData = FALSE)
-    HTML(paste0(
+    HTML(  
+      paste0(
       "<h3>", "Summary", "</h3>",
       "Principal (loan amount): ", format(round(prin, 2), big.mark = ","),
       "<br>",
@@ -212,7 +219,30 @@ server <- function(input, output) {
       "<b>", "Monthly payment: ", format(round(monthPay, digits = 2), big.mark = ","), "</b>",
       "<br>",
       "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>"
-    ))
+    ),
+    if (input$selling == TRUE) {
+      n <- 12*as.integer(input$length)
+      newMonthlyPayment <- sellearly(interestRate = input$interest, numPayment = n, loanValue = prin)
+      amountLeft <- n * newMonthlyPayment
+      yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
+      futureValue <- amountLeft*(1+input$interest)^yearsLeft
+      HTML(paste0(
+        "<br>",
+        "<br>",
+        "<br>",
+        "New Monthy Payment: ", format(round(newMonthlyPayment, digits = 2), big.mark = ","),
+        "<br>",
+        "Amount left to Pay: ", format(round(amountLeft, digits = 2), big.mark = ","),
+        "<br>",
+        "Future Value: ", format(round(futureValue, digits = 2), big.mark = ",")
+      ))
+    }
+    else {
+      paste0("")
+    }
+
+    )
+
   })
   
   output$distPlot <- renderPlot({
