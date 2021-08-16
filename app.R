@@ -197,7 +197,7 @@ server <- function(input, output) {
     
   }
   sellearly <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
-    paymentValue <- loanValue*(interestRate*(1+interestRate)^numPayment)/(((1+interestRate)^numPayment)-1)
+    paymentValue <- loanValue*(interestRate*((1+interestRate)^numPayment))/(((1+interestRate)^numPayment)-1)
     return( paymentValue )
   }
   # ------------------------
@@ -221,11 +221,15 @@ server <- function(input, output) {
       "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>"
     ),
     if (input$selling == TRUE) {
-      n <- 12*as.integer(input$length)
-      newMonthlyPayment <- sellearly(interestRate = input$interest, numPayment = n, loanValue = prin)
-      amountLeft <- n * newMonthlyPayment
       yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
-      futureValue <- amountLeft*(1+input$interest)^yearsLeft
+      n <- 12*yearsLeft
+      totalPayments <- 12*as.integer(input$length)
+      interestPercent <- input$interest/100
+      monthyInterest <- interestPercent / 12
+      newMonthlyPayment <- sellearly(interestRate = monthyInterest, numPayment = totalPayments, loanValue = prin)
+      amountLeft <- n * newMonthlyPayment
+      
+      futureValue <- amountLeft*(1+interestPercent)^yearsLeft
       HTML(paste0(
         "<br>",
         "<br>",
