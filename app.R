@@ -202,7 +202,7 @@ server <- function(input, output) {
     
     
   }
-  sellearly <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
+  payment <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
     paymentValue <- loanValue*(interestRate*((1+interestRate)^numPayment))/(((1+interestRate)^numPayment)-1)
     return( paymentValue )
   }
@@ -233,32 +233,37 @@ server <- function(input, output) {
       "30 year mortgage: ", format(round(monthPay30, digits = 2), big.mark = ","), "</b>"
     ),
     if (input$selling == TRUE) {
+
       yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
       n <- 12*yearsLeft
       totalPayments <- 12*as.integer(input$length)
-      interestPercent <- input$interest/100
+      interestPercent <- input$interest / 100
       monthlyInterest <- interestPercent / 12
-      newMonthlyPayment <- sellearly(interestRate = monthlyInterest, numPayment = totalPayments, loanValue = prin)
-      amountLeft <- newMonthlyPayment/monthlyInterest*(1-1/(1+monthlyInterest)^(totalPayments-n))
-      
-      futureValue <- amountLeft*(1+interestPercent)^yearsLeft
+      monthlyPayment <- payment(interestRate = monthlyInterest, numPayment = totalPayments, loanValue = prin)
+      amountPaid <- monthlyPayment/monthlyInterest*(1-1/(1+monthlyInterest)^(totalPayments-n))
+
+      if (yearsLeft <= 0) {
+        amountLeft <- 0
+        futureValue <- 0
+      }
+      else {
+        amountLeft <- prin-amountPaid
+        futureValue <- amountLeft*(1+interestPercent)^yearsLeft
+      }
+
       HTML(paste0(
         "<br>",
         "<br>",
+        "<u>How much will I owe if I sell my house in X years?</u>",
         "<br>",
-        # "New Monthy Payment: ", format(round(newMonthlyPayment, digits = 2), big.mark = ","),
-        # "<br>",
-        "Amount left to Pay: ", format(round(amountLeft, digits = 2), big.mark = ","),
+        "Amount left to Pay: <b>", format(round(amountLeft, digits = 2), big.mark = ","), "</b>",
         "<br>",
-        "Future Value: ", format(round(futureValue, digits = 2), big.mark = ",")
+        "Future Value: <b>", format(round(futureValue, digits = 2), big.mark = ","), "</b>",
+        "<br>"
       ))
     }
-    else {
-      paste0("")
-    }
-
+    else { paste0("") }
     )
-
   })
   
   output$distPlot <- renderPlot({
