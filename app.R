@@ -224,12 +224,6 @@ server <- function(input, output) {
         "<br>",
         "<b>", "Monthly payment: ", format(round(monthPay, digits = 2), big.mark = ","), "</b>",
         "<br>",
-        "15 Year Mortgage Montly Payment: ", format(round(monthPay15, digits = 2), big.mark = ","), " (", format(round(monthPay15-monthPay, digits = 2), big.mark = ",") ,")","</b>",
-        "<br>",
-        "20 Year Mortgage Montly Payment: ", format(round(monthPay20, digits = 2), big.mark = ","), " (", format(round(monthPay20-monthPay, digits = 2), big.mark = ",") ,")","</b>",
-        "<br>",
-        "30 Year Mortgage Montly Payment: ", format(round(monthPay30, digits = 2), big.mark = ","), " (", format(round(monthPay30-monthPay, digits = 2), big.mark = ",") ,")","</b>",
-        "<br>",
         "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>"
       ),
       if (input$selling == TRUE) {
