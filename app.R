@@ -23,7 +23,7 @@ ui <- fluidPage(
   
   # App title ----
   titlePanel("Mortgage Calculator"),
-
+  
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     
@@ -47,10 +47,10 @@ ui <- fluidPage(
       # numericInput("downpayment", "Down Payment", 200000, min = 0, step = 500),
       # hr(),
       radioButtons("length", "Duration of the mortgage",
-                    choices = list("15 Year" = 15, 
-                                   "20 Year" = 20,
-                                   "30 Year" = 30),
-                              selected = 20
+                   choices = list("15 Year" = 15, 
+                                  "20 Year" = 20,
+                                  "30 Year" = 30),
+                   selected = 20
       ),
       hr(),
       p(HTML('<p>How much will I owe if I sell my house in X years?</p>')),
@@ -153,7 +153,7 @@ server <- function(input, output) {
       )
       aDFyear <<- aDFyear
     }
-
+    
     if (plotData == TRUE) {
       aDFyear2 <- aDFyear %>%
         rename(
@@ -184,7 +184,7 @@ server <- function(input, output) {
       #   aDFyear3$TaxSavings <- aDFyear3$Interest * taxRate/100
       #   aDFyear3$Year <- as.factor(aDFyear3$Year)
       #   aDFyear3 <- melt(aDFyear3[, c("TaxSavings", "Effective_Interest", "Principal", "Year")], id.vars = "Year")
-        
+      
       #   p2 <- ggplot(aDFyear3, aes(x = Year, y = value, fill = variable)) +
       #     geom_bar(position = "fill", stat = "identity") +
       #     labs(y = "Payment") +
@@ -192,8 +192,8 @@ server <- function(input, output) {
       #     theme_minimal() +
       #     theme(legend.title = element_blank(), legend.position = "top") +
       #     scale_fill_manual("legend", values = c("Principal" = "black", "Effective_Interest" = "red", "TaxSavings" = "green"))
-        
-        
+      
+      
       #   plts <- list(p1,p2)
       # }
       grid.arrange(grobs=plts,ncol=length(plts))
@@ -202,63 +202,68 @@ server <- function(input, output) {
     
     
   }
-  sellearly <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
+  payment <- function( interestRate = .05, numPayment = 1, loanValue = 0 ) {
     paymentValue <- loanValue*(interestRate*((1+interestRate)^numPayment))/(((1+interestRate)^numPayment)-1)
     return( paymentValue )
   }
   # ------------------------
- 
+  
   # --------------------------
   
-    output$text <- renderUI({
-      prin <- input$principal
+  output$text <- renderUI({
+    prin <- input$principal
     mortgage(P = prin, I = input$interest, L = as.integer(input$length), plotData = FALSE)
     HTML(  
       paste0(
-      "<h3>", "Summary", "</h3>",
-      "Principal (loan amount): ", format(round(prin, 2), big.mark = ","),
-      "<br>",
-      "Annual interest rate: ", input$interest, "%",
-      "<br>",
-      "Term: ", as.integer(input$length), " years (", as.integer(input$length) * 12, " months)",
-      "<br>",
-      "<b>", "Monthly payment: ", format(round(monthPay, digits = 2), big.mark = ","), "</b>",
-      "<br>",
-      "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>",
-      "<br>",
-      "15 year mortgage: ", format(round(monthPay15, digits = 2), big.mark = ","), "</b>",
-      "<br>",
-      "20 year mortgage: ", format(round(monthPay20, digits = 2), big.mark = ","), "</b>",
-      "<br>",
-      "30 year mortgage: ", format(round(monthPay30, digits = 2), big.mark = ","), "</b>"
-    ),
-    if (input$selling == TRUE) {
-      yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
-      n <- 12*yearsLeft
-      totalPayments <- 12*as.integer(input$length)
-      interestPercent <- input$interest/100
-      monthlyInterest <- interestPercent / 12
-      newMonthlyPayment <- sellearly(interestRate = monthlyInterest, numPayment = totalPayments, loanValue = prin)
-      amountLeft <- newMonthlyPayment/monthlyInterest*(1-1/(1+monthlyInterest)^(totalPayments-n))
-      
-      futureValue <- amountLeft*(1+interestPercent)^yearsLeft
-      HTML(paste0(
+        "<h3>", "Summary", "</h3>",
+        "Principal (loan amount): ", format(round(prin, 2), big.mark = ","),
         "<br>",
+        "Annual interest rate: ", input$interest, "%",
         "<br>",
+        "Term: ", as.integer(input$length), " years (", as.integer(input$length) * 12, " months)",
         "<br>",
-        # "New Monthy Payment: ", format(round(newMonthlyPayment, digits = 2), big.mark = ","),
-        # "<br>",
-        "Amount left to Pay: ", format(round(amountLeft, digits = 2), big.mark = ","),
+        "<b>", "Monthly payment: ", format(round(monthPay, digits = 2), big.mark = ","), "</b>",
         "<br>",
-        "Future Value: ", format(round(futureValue, digits = 2), big.mark = ",")
-      ))
-    }
-    else {
-      paste0("")
-    }
-
+        "15 Year Mortgage Montly Payment: ", format(round(monthPay15, digits = 2), big.mark = ","), " (", format(round(monthPay15-monthPay, digits = 2), big.mark = ",") ,")","</b>",
+        "<br>",
+        "20 Year Mortgage Montly Payment: ", format(round(monthPay20, digits = 2), big.mark = ","), " (", format(round(monthPay20-monthPay, digits = 2), big.mark = ",") ,")","</b>",
+        "<br>",
+        "30 Year Mortgage Montly Payment: ", format(round(monthPay30, digits = 2), big.mark = ","), " (", format(round(monthPay30-monthPay, digits = 2), big.mark = ",") ,")","</b>",
+        "<br>",
+        "<b>", "Total cost: ", "</b>", format(round(prin, 2), big.mark = ","), " (principal) + ", format(round(monthPay * 12 * as.integer(input$length) - prin, 2), big.mark = ","), " (interest) = ", "<b>", format(round(monthPay * 12 * as.integer(input$length), digits = 2), big.mark = ","), "</b>"
+      ),
+      if (input$selling == TRUE) {
+        
+        yearsLeft <- as.integer(input$length) - as.integer(input$yearsowned)
+        n <- 12*yearsLeft
+        totalPayments <- 12*as.integer(input$length)
+        interestPercent <- input$interest / 100
+        monthlyInterest <- interestPercent / 12
+        monthlyPayment <- payment(interestRate = monthlyInterest, numPayment = totalPayments, loanValue = prin)
+        amountPaid <- monthlyPayment/monthlyInterest*(1-1/(1+monthlyInterest)^(totalPayments-n))
+        
+        if (yearsLeft <= 0) {
+          amountLeft <- 0
+          futureValue <- 0
+        }
+        else {
+          amountLeft <- prin-amountPaid
+          futureValue <- amountLeft*(1+interestPercent)^yearsLeft
+        }
+        
+        HTML(paste0(
+          "<br>",
+          "<br>",
+          "<u>How much will I owe if I sell my house in X years?</u>",
+          "<br>",
+          "Amount left to Pay: <b>", format(round(amountLeft, digits = 2), big.mark = ","), "</b>",
+          "<br>",
+          "Future Value: <b>", format(round(futureValue, digits = 2), big.mark = ","), "</b>",
+          "<br>"
+        ))
+      }
+      else { paste0("") }
     )
-
   })
   
   output$distPlot <- renderPlot({
@@ -266,7 +271,7 @@ server <- function(input, output) {
     mortgage(P = prin, I = input$interest, L = as.integer(input$length), plotData = input$plot, taxPlot = input$tax, taxRate = input$taxrate)
   })
   
-
+  
   # Data output
   output$tbl <- DT::renderDataTable({
     prin <- input$principal
